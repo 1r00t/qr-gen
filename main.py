@@ -4,8 +4,9 @@ from utils.image_operations import get_round_corners, apply_perspective_transfor
 from utils.pattern_mask import generate_qr_code_mask, is_marker
 
 # Settings
-pixel_size = 16
-padding = 4 * pixel_size
+PIXEL_SIZE = 16
+PADDING = 4 * PIXEL_SIZE
+IMAGE_SIZE = 512
 BG_COLOR = (128, 128, 128)
 QUIET_COLOR = (225, 225, 225)
 MODULE_COLOR = (64, 64, 64)
@@ -18,7 +19,7 @@ matrix = qrcode.matrix
 version = int(qrcode.version)
 
 # Create image
-w = h = (len(matrix) * pixel_size) + (padding * 2)
+w = h = (len(matrix) * PIXEL_SIZE) + (PADDING * 2)
 image = Image.new(mode="RGB", size=(w, h), color=QUIET_COLOR)
 draw = ImageDraw.Draw(image)
 
@@ -32,10 +33,10 @@ for y, row in enumerate(matrix):
             color = MARKER_COLOR if is_marker(pattern_mask, (x, y)) else MODULE_COLOR
             draw.rounded_rectangle(
                 (
-                    (padding + x * pixel_size, padding + y * pixel_size),
+                    (PADDING + x * PIXEL_SIZE, PADDING + y * PIXEL_SIZE),
                     (
-                        padding + x * pixel_size + pixel_size,
-                        padding + y * pixel_size + pixel_size,
+                        PADDING + x * PIXEL_SIZE + PIXEL_SIZE,
+                        PADDING + y * PIXEL_SIZE + PIXEL_SIZE,
                     ),
                 ),
                 radius=7,
@@ -44,13 +45,14 @@ for y, row in enumerate(matrix):
             )
 
 # Scale down the image
-scaled_down_image = ImageOps.scale(image, (512 / image.width) * 0.75)
-image = Image.new("RGB", (512, 512), color=BG_COLOR)
+scaled_down_image = ImageOps.scale(image, (IMAGE_SIZE / image.width) * 0.75)
+image = Image.new("RGB", (IMAGE_SIZE, IMAGE_SIZE), color=BG_COLOR)
 x = (image.width - scaled_down_image.width) // 2
 y = (image.height - scaled_down_image.height) // 2
 image.paste(scaled_down_image, (x, y))
 
 # Apply perspective transform
-image = apply_perspective_transform(image, pixel_size, padding, 2, BG_COLOR)
+# TODO: make the angle not dependent on IMAGE_SIZE
+image = apply_perspective_transform(image, PIXEL_SIZE, PADDING, 2, BG_COLOR)
 
 image.save("pil.png")
