@@ -1,5 +1,5 @@
 from typing import List, Union
-from PIL import Image
+from PIL import Image, ImageDraw
 import random
 import numpy as np
 import cv2
@@ -45,7 +45,11 @@ def get_round_corners(
 
 
 def apply_perspective_transform(
-    image: Image, pixel_size: int, padding: int, pixel_amount: int
+    image: Image,
+    pixel_size: int,
+    padding: int,
+    pixel_amount: int,
+    bg_color: tuple,
 ):
     # Load the image using PIL
     width, height = image.size
@@ -79,7 +83,7 @@ def apply_perspective_transform(
         np.array(image),
         perspective_matrix,
         (width, height),
-        borderValue=(255, 255, 255),
+        borderValue=bg_color,
     )
 
     # Convert the transformed image to PIL format
@@ -87,3 +91,10 @@ def apply_perspective_transform(
 
     # Return the transformed image
     return transformed_image
+
+
+
+def color_corners(image: Image, color: tuple):
+    draw = ImageDraw.Draw(image)
+
+    draw.regular_polygon
