@@ -9,14 +9,17 @@ PADDING = 4 * PIXEL_SIZE
 IMAGE_SIZE = 512
 BG_COLOR = (128, 128, 128)
 QUIET_COLOR = (225, 225, 225)
-MODULE_COLOR = (64, 64, 64)
-MARKER_COLOR = (0, 0, 0)
+MODULE_COLOR = (32, 32, 32)
+PATTERN_COLOR = (0, 0, 0)
 
 # Create QR code and binary mask
-qrcode = segno.make("headful.io", error="H")
+qrcode = segno.make("headful.io", error="H", version=8)
 
 matrix = qrcode.matrix
 version = int(qrcode.version)
+
+print(f"image version: {version}")
+print(f"image size: {IMAGE_SIZE}")
 
 # Create image
 w = h = (len(matrix) * PIXEL_SIZE) + (PADDING * 2)
@@ -30,7 +33,7 @@ pattern_mask = generate_qr_code_mask(version)
 for y, row in enumerate(matrix):
     for x, c in enumerate(row):
         if c == 1:
-            color = MARKER_COLOR if is_marker(pattern_mask, (x, y)) else MODULE_COLOR
+            color = PATTERN_COLOR if is_marker(pattern_mask, (x, y)) else MODULE_COLOR
             draw.rounded_rectangle(
                 (
                     (PADDING + x * PIXEL_SIZE, PADDING + y * PIXEL_SIZE),
